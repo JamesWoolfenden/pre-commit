@@ -7,7 +7,7 @@
   files: (\.tf|\.tfvars)$
   exclude: \.terraform\/.*$
   
-- id: checkov
+- id: checkov-scan
   name: checkov
   description: runs checkov over a project
   entry: checkov
