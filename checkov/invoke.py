@@ -16,9 +16,8 @@ def run(filenames):
         folders.append(os.path.dirname(file))
     
     # get root folder
-    myrootfolder=os.path.abspath(min(set(folders), key=len))
-    
-    stdout=subprocess.run(["checkov","-d", os.path.join(myrootfolder, '')], shell=False, capture_output=False)    
+    myrootfolder=os.path.join(os.path.abspath(min(set(folders), key=len)), '')
+    stdout=subprocess.run(["checkov","-d", myrootfolder], shell=False, capture_output=False)    
 
     if stdout:
         invalid = True
@@ -35,6 +34,10 @@ def main(argv=None):
         nargs="*",
         help="Filenames pre-commit believes are changed.")
     
+    parser.add_argument(
+        "-d", help="directory to run against"
+    )
+
     args = parser.parse_args(argv)
 
     return run(args.filenames)
