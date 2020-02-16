@@ -1,7 +1,19 @@
 ---
 - id: terraform-fmt
-  name: Rewrite Terraform configuration files to a canonical format and style
+  name: terraform-fmt
   entry: terraform-fmt
+  description: Rewrite Terraform configuration files to a canonical format and style
   language: python
   files: (\.tf|\.tfvars)$
   exclude: \.terraform\/.*$
+  
+- id: checkov
+  name: checkov
+  description: runs checkov over project
+  require_serial: true
+  entry: checkov
+  language: python
+  files: (\.tf)$
+  exclude: \.terraform\/.*$
+  always_run: false
+  pass_filenames: true
