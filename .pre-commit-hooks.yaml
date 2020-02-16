@@ -10,7 +10,7 @@
 - id: checkov-scan
   name: checkov
   description: runs checkov over a project
-  entry: checkov
+  entry: checkov-scan
   language: python
   files: (\.tf)$
   exclude: \.terraform\/.*$
