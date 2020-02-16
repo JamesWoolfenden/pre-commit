@@ -8,7 +8,7 @@ import os.path
 
 def run(filenames):
     """Run 'checkov' command on a dir."""
-    
+
     folders=[]
     for file in filenames:
         folders.append(os.path.dirname(file))
@@ -16,8 +16,12 @@ def run(filenames):
     # get root
     root=os.path.abspath(min(set(folders), key=len))
 
-    output=subprocess.run(["checkov","-d", os.path.join(root, '')])    
-    return output
+    stdout=subprocess.run(["checkov","-d", os.path.join(root, '')])    
+
+    if stdout:
+        invalid = True
+        print("Analysed {}".format(root), file=sys.stderr)
+    return int(invalid)
     
 def main(argv=None):
     """Main execution path."""
