@@ -6,23 +6,37 @@ import sys
 import os.path
 
 
-def run(dir):
+def run(filenames):
     """Run 'checkov' command on a dir."""
-    subprocess.run(["checkov","-d", dir])    
+    
+    folders=[]
+    for file in filenames:
+        folders.append(os.path.dirname(file))
+    
+    print(folders)
+
+    # get root
+    root=min(set(folders), key=len)
+
+    print(root)
+    #this might not be the best path
+    subprocess.run(["checkov","-d", os.path.join(root, '')])    
     return
     
 def main(argv=None):
     """Main execution path."""
 
-    #print(os.path.dirname("/mnt/c/code/travst.txt"))
     print(argv)
     parser = argparse.ArgumentParser()
-    
-    parser.add_argument('--dir', help='path to analyse')
+
+    parser.add_argument(
+        "filenames",
+        nargs="*",
+        help="Filenames pre-commit believes are changed.")
     
     args = parser.parse_args(argv)
 
-    return run(args.dir)
+    return run(args.filenames)
 
 
 
