@@ -10,7 +10,6 @@
 - id: checkov
   name: checkov
   description: runs checkov over a project
-  require_serial: true
   entry: checkov
   language: python
   files: (\.tf)$

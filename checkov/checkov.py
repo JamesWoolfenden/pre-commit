@@ -15,7 +15,8 @@ def run(filenames):
     
     # get root
     root=os.path.abspath(min(set(folders), key=len))
-
+    print(root)
+    
     stdout=subprocess.run(["checkov","-d", os.path.join(root, '')])    
 
     if stdout:
