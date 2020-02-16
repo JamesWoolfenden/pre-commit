@@ -12,7 +12,7 @@
   description: runs checkov over a project
   entry: checkov-scan
   language: python
-  language_version: 3.7
+  language_version: python3.7
   files: (\.tf)$
   exclude: \.terraform\/.*$
   always_run: true
