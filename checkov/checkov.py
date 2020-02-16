@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Checkov"""
 from __future__ import print_function
 import argparse
@@ -17,7 +18,9 @@ def run(filenames):
     root=os.path.abspath(min(set(folders), key=len))
     print(root)
     
-    stdout=subprocess.run(["checkov","-d", os.path.join(root, '')])    
+    stdout=subprocess.run(["checkov","-d", os.path.join(root, '')], shell=False, capture_output=False)    
+
+    print(stdout)
 
     if stdout:
         invalid = True
@@ -27,7 +30,6 @@ def run(filenames):
 def main(argv=None):
     """Main execution path."""
 
-    print(argv)
     parser = argparse.ArgumentParser()
 
     parser.add_argument(

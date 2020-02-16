@@ -16,3 +16,4 @@
   exclude: \.terraform\/.*$
   always_run: true
   pass_filenames: true
+  verbose: true
