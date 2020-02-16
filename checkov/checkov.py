@@ -13,15 +13,10 @@ def run(filenames):
     for file in filenames:
         folders.append(os.path.dirname(file))
     
-    print(folders)
-
     # get root
     root=os.path.abspath(min(set(folders), key=len))
 
-
-    print(root)
-    #this might not be the best path
-    subprocess.run(["checkov","-d", os.path.join(root, '')])    
+    subprocess.check_output(["checkov","-d", os.path.join(root, '')])    
     return
     
 def main(argv=None):
