@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Checkov"""
-from __future__ import print_function
+from __future__ 
+import print_function
 import argparse
 import subprocess
 import sys
