@@ -1,4 +1,4 @@
-# pre-commit-terraform-fmt
+# pre-commit-terraform-fmt [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform configuration files to a canonical format.
 

@@ -8,7 +8,7 @@ import os.path
 
 def run(filenames):
     """Run 'checkov' command on a dir."""
-
+    invalid = False
     folders=[]
     for file in filenames:
         folders.append(os.path.dirname(file))
