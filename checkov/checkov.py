@@ -16,7 +16,8 @@ def run(filenames):
     print(folders)
 
     # get root
-    root=min(set(folders), key=len)
+    root=os.path.abspath(min(set(folders), key=len))
+
 
     print(root)
     #this might not be the best path
