@@ -12,11 +12,12 @@ def run(filenames):
     invalid = False
     myrootfolder=""
     folders=[]
-    for file in filenames:
-        folders.append(os.path.dirname(file))
+    for files in filenames:
+        folders.append(os.path.dirname(files))
     
     temporary=os.path.abspath(min(set(folders), key=len))
     print("Temporary",temporary)
+    
     # get root folder
     myrootfolder=os.path.join(temporary, '')
     
@@ -24,7 +25,7 @@ def run(filenames):
 
     if stdout:
         invalid = True
-        #print("Analysed {}".format(myrootfolder), myrootfolder=sys.stderr)
+        print("Analysed {}".format(myrootfolder), file=sys.stderr)
     return int(invalid)
     
 def main(argv=None):
