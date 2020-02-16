@@ -17,7 +17,7 @@ def run(filenames):
     root=os.path.abspath(min(set(folders), key=len))
 
     output=subprocess.run(["checkov","-d", os.path.join(root, '')])    
-    return output
+    return 
     
 def main(argv=None):
     """Main execution path."""
