@@ -15,18 +15,14 @@ def run(filenames):
     for files in filenames:
         folders.append(os.path.dirname(files))
     
-    temporary=os.path.abspath(min(set(folders), key=len))
-    print("Temporary",temporary)
-    
-    # get root folder
-    myrootfolder=os.path.join(temporary, '')
+    myrootfolder=os.path.join(os.path.abspath(min(folders, key=len, default=".")), '')
     
     stdout=subprocess.run(["checkov","-d", myrootfolder], shell=False, capture_output=False)    
 
     if stdout:
         invalid = True
         print("Analysed {}".format(myrootfolder), file=sys.stderr)
-    return int(invalid)
+    return stdout.returncode
     
 def main(argv=None):
     """Main execution path."""
