@@ -28,6 +28,10 @@ setuptools.setup(
     setup_requires=["pytest-runner"],
     install_requires=['future;python_version<"3.0"'],
     tests_require=["pytest", "pytest-datafiles", "pytest-pylint"],
-    entry_points={"console_scripts": ["terraform-fmt = terraform.fmt:main",
-	"checkov-scan = checkov.invoke:main"]},
+    entry_points={
+        "console_scripts": [
+            "terraform-fmt = terraform.fmt:main",
+            "checkov-scan = checkov.invoke:main",
+        ]
+    },
 )
