@@ -6,8 +6,6 @@ After <https://github.com/melmorabity/pre-commit-terraform-fmt>
 
 A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform configuration files to a canonical format.
 
-## Usage
-
 `.pre-commit-config.yaml`:
 
 ```yaml
@@ -21,10 +19,10 @@ A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform configuration 
 
 ## Checkov-scan
 
-This runs the Static analysis https://www.checkov.io/
+This runs the Static analysis tool https://www.checkov.io/
 
 For Checkov-scan:
-```
+```yaml
 - repo: git://github.com/jameswoolfenden/pre-commit
   rev: 0.0.18
   hooks:
