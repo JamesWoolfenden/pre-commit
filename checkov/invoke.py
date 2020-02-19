@@ -18,9 +18,16 @@ def run(filenames):
         os.path.abspath(min(folders, key=len, default=".")), ""
     )
 
-    stdout = subprocess.run(
-        ["checkov", "-d", myrootfolder], shell=False, capture_output=False
-    )
+    if os.name == "nt":
+        stdout = subprocess.run(
+            ["checkov-scan.bat", "-d", myrootfolder],
+            shell=False,
+            capture_output=False,
+        )
+    else:
+        stdout = subprocess.run(
+            ["checkov", "-d", myrootfolder], shell=False, capture_output=False
+        )
 
     if stdout:
         print("Analysed {}".format(myrootfolder), file=sys.stderr)
