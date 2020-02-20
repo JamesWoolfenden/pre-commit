@@ -22,10 +22,22 @@ A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform configuration 
 This runs the Static analysis tool https://www.checkov.io/
 
 For Checkov-scan:
+
 ```yaml
 - repo: git://github.com/jameswoolfenden/pre-commit
   rev: 0.0.18
   hooks:
     - id: checkov-scan
       files: \.tf$
+```
+
+## Terraform-docs
+
+Updates README.md with parameters, modules.
+
+```yaml
+- repo: git://github.com/jameswoolfenden/pre-commit
+  rev: 0.0.22
+  hooks:
+    - id: terraform-docs
 ```
