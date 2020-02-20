@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """terraform-docs"""
 
-import argparse
+# import argparse
 import subprocess
 import os.path
 import re
@@ -53,19 +53,20 @@ def run(filenames):
 def main(argv=None):
     """Main execution path."""
 
-    parser = argparse.ArgumentParser()
+    # parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "filenames",
-        nargs="*",
-        help="Filenames pre-commit believes are changed.",
-    )
+    # parser.add_argument(
+    #    "filenames",
+    #    nargs="*",
+    #    help="Filenames pre-commit believes are changed.",
+    # )
 
     # parser.add_argument("md", help="directory to run against")
 
-    args = parser.parse_args(argv)
+    # args = parser.parse_args(argv)
 
-    return run(args.filenames)
+    # return run(args.filenames)
+    return run()
 
 
 if __name__ == "__main__":
