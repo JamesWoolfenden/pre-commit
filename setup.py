@@ -8,13 +8,13 @@ import setuptools
 
 
 setuptools.setup(
-    name="pre-commit-terraform-fmt",
+    name="pre-commit",
     description="Rewrite Terraform configuration files to a canonical format"
     "and style",
     url="https://github.com/melmorabity/pre-commit-terraform-fmt",
-    version="0.0.1",
-    author="Mohamed El Morabity",
-    author_email="melmorabity@fedoraproject.org",
+    version="0.1.3",
+    author=["Mohamed El Morabity", "James Woolfenden"],
+    author_email="james.woolfenden@gmail.com",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later "
         "(GPLv3+)",
@@ -32,7 +32,7 @@ setuptools.setup(
         "console_scripts": [
             "terraform-fmt = terraform.fmt:main",
             "checkov-scan = checkov.invoke:main",
-            "terraform-docs = terraform-docs.invoke:main",
+            "terraform-docs = docs.invoke:main",
         ]
     },
 )
