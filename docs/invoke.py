@@ -61,7 +61,7 @@ def main(argv=None):
         help="Filenames pre-commit believes are changed.",
     )
 
-    parser.add_argument("md", help="directory to run against")
+    # parser.add_argument("md", help="directory to run against")
 
     args = parser.parse_args(argv)
 
