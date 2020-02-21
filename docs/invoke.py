@@ -59,7 +59,7 @@ def run(filenames):
 
     writeme(readmefile, nublock)
 
-    return
+    return paramblock.returncode
 
 
 def main(argv=None):
