@@ -19,14 +19,14 @@
   pass_filenames: false
   verbose: true
 
-- id: terraform-docs
-  name: terraform-docs
+- id: tf2docs
+  name: tf2docs
   description: builds markdown docs
-  entry: terraform-docs
+  entry: tf2docs
   language: python
   language_version: python3.7
   files: (\.tf)$
   exclude: \.terraform\/.*$
-  always_run: true
+  always_run: false
   pass_filenames: false
   verbose: true

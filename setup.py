@@ -32,7 +32,7 @@ setuptools.setup(
         "console_scripts": [
             "terraform-fmt = terraform.fmt:main",
             "checkov-scan = checkov.invoke:main",
-            "terraform-docs = docs.invoke:main",
+            "tf2docs = tf2docs.invoke:main",
         ]
     },
 )
