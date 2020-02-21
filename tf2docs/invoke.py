@@ -46,13 +46,13 @@ def run(filenames):
     )
 
     reg = re.compile(
-        "(?<=<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)(\r?\n\r?\n)"
+        "(?<=<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)"
         "(.*?)"
         "(?=<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)",
         re.DOTALL,
     )
 
-    nublock = reg.sub(paramblock.stdout, oldblock)
+    nublock = reg.sub("\r\n" + paramblock.stdout, oldblock)
     if nublock == oldblock:
         print("No update")
         exit
