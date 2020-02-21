@@ -13,7 +13,15 @@ def readme(readmefile):
     f = open(readmefile, "r")
     if f.mode == "r":
         contents = f.read()
+    f.close
     return contents
+
+
+def writeme(readmefile, block):
+    f = open(readmefile, "w+")
+    f.write(block)
+    f.close
+    return 0
 
 
 def run(filenames):
@@ -26,9 +34,10 @@ def run(filenames):
         os.path.abspath(min(folders, key=len, default=".")), ""
     )
 
-    ss = readme(readmefile)
+    readmepath = os.path.join(myrootfolder, readmefile)
+    oldblock = readme(readmepath)
 
-    block = subprocess.run(
+    paramblock = subprocess.run(
         ["terraform-docs", "md", myrootfolder],
         shell=False,
         text=True,
@@ -42,10 +51,13 @@ def run(filenames):
         "(?=\r?\n<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)",
         re.DOTALL,
     )
-    nublock = reg.sub(block.stdout, ss)
-    f = open(readmefile, "w+")
-    f.write(nublock)
-    f.close
+
+    nublock = reg.sub(paramblock.stdout, oldblock)
+    if nublock == oldblock:
+        print("No update")
+        exit
+
+    writeme(readmefile, nublock)
 
     return
 
