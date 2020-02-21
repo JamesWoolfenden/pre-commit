@@ -46,9 +46,9 @@ def run(filenames):
     )
 
     reg = re.compile(
-        "(?<=<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)(\r?\n)"
+        "(?<=<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)(\r?\n\r?\n)"
         "(.*?)"
-        "(?=\r?\n<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)",
+        "(?=<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)",
         re.DOTALL,
     )
 
