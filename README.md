@@ -1,5 +1,7 @@
 # pre-commit
 
+[![Build Status](https://github.com/JamesWoolfenden/pre-commit/workflows/Verify%20and%20Bump/badge.svg?branch=master)](https://github.com/JamesWoolfenden/pre-commit) 
+[![Latest Release](https://img.shields.io/github/release/JamesWoolfenden/pre-commit.svg)](https://github.com/JamesWoolfenden/pre-commit/releases/latest)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 After <https://github.com/melmorabity/pre-commit-terraform-fmt>
@@ -43,3 +45,9 @@ Updates README.md with parameters, modules.
   hooks:
     - id: terraform-docs
 ```
+### Contributors
+
+[![James Woolfenden][jameswoolfenden_avatar]][jameswoolfenden_homepage]<br/>[James Woolfenden][jameswoolfenden_homepage]
+
+[jameswoolfenden_homepage]: https://github.com/jameswoolfenden
+[jameswoolfenden_avatar]: https://github.com/jameswoolfenden.png?size=150
