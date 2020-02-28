@@ -10,7 +10,7 @@ readmefile = "README.md"
 
 
 def readme(readmefile):
-    f = open(readmefile, "r")
+    f = open(readmefile, "r", encoding="utf-8", newline="\n")
     if f.mode == "r":
         contents = f.read()
     f.close
