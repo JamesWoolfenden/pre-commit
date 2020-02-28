@@ -55,7 +55,7 @@ def run(filenames):
     nublock = reg.sub("\r\n" + paramblock.stdout, oldblock)
     if nublock == oldblock:
         print("No update")
-        exit
+        exit(0)
 
     writeme(readmefile, nublock)
 
