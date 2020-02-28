@@ -18,6 +18,7 @@
   always_run: false
   pass_filenames: false
   verbose: true
+  additional_dependencies: ['checkov']
 
 - id: tf2docs
   name: tf2docs
