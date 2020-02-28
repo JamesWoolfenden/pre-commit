@@ -18,7 +18,7 @@ def readme(readmefile):
 
 
 def writeme(readmefile, block):
-    f = open(readmefile, "w+", encoding="utf-8")
+    f = open(readmefile, "w+", encoding="utf-8", newline="\n")
     f.write(block)
     f.close
     return 0
