@@ -18,7 +18,7 @@ def readme(readmefile):
 
 
 def writeme(readmefile, block):
-    f = open(readmefile, "w+")
+    f = open(readmefile, "w+", "utf-8")
     f.write(block)
     f.close
     return 0
@@ -72,8 +72,6 @@ def main(argv=None):
         nargs="*",
         help="Filenames pre-commit believes are changed.",
     )
-
-    # parser.add_argument("md", help="directory to run against")
 
     args = parser.parse_args(argv)
 
