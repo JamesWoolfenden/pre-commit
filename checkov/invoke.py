@@ -20,7 +20,7 @@ def run(filenames):
 
     if os.name == "nt":
         stdout = subprocess.run(
-            ["checkov.bat", "-d", myrootfolder],
+            ["checkov.cmd", "-d", myrootfolder],
             shell=False,
             capture_output=False,
         )

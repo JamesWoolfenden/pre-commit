@@ -1,4 +1,6 @@
-# pre-commit-terraform-fmt [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+# pre-commit
+
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 After <https://github.com/melmorabity/pre-commit-terraform-fmt>
 
