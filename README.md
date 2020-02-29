@@ -23,7 +23,7 @@ A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform configuration 
 
 ## Checkov-scan
 
-This runs the Static analysis tool https://www.checkov.io/
+This runs the Static analysis tool https://www.checkov.io/ for Terraform, the hook automatically installs the Checkov tool.
 
 For Checkov-scan:
 
@@ -38,6 +38,13 @@ For Checkov-scan:
 ## Terraform-docs
 
 Updates README.md with parameters, modules.
+Requires:
+```
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+```
+The Hook will update in-betweeen with the Terraform-Docs created content.
+The hook requires that [terraform-docs](https://github.com/segmentio/terraform-docs) be installed, then add a section to you pre-commit-config.yml, updating to the latest version :
 
 ```yaml
 - repo: git://github.com/jameswoolfenden/pre-commit
@@ -45,6 +52,7 @@ Updates README.md with parameters, modules.
   hooks:
     - id: terraform-docs
 ```
+
 ### Contributors
 
 [![James Woolfenden][jameswoolfenden_avatar]][jameswoolfenden_homepage]<br/>[James Woolfenden][jameswoolfenden_homepage]
