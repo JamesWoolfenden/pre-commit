@@ -2,14 +2,14 @@
 - id: terraform-fmt
   name: terraform-fmt
   entry: terraform-fmt
-  description: Rewrite Terraform configuration files to a canonical format and style
+  description: Rewrite Terraform configuration files to a canonical format and style, cross platform compatible
   language: python
   files: (\.tf|\.tfvars)$
   exclude: \.terraform\/.*$
 
 - id: checkov-scan
   name: checkov
-  description: runs checkov over a project
+  description: runs checkov over a project, cross platform compatible
   entry: checkov-scan
   language: python
   language_version: python3.7
@@ -22,7 +22,7 @@
 
 - id: tf2docs
   name: tf2docs
-  description: builds markdown docs
+  description: builds markdown docs, cross platform compatible 
   entry: tf2docs
   language: python
   language_version: python3.7
