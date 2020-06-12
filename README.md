@@ -55,7 +55,11 @@ The hook requires that [terraform-docs](https://github.com/segmentio/terraform-d
 
 ### Contributors
 
-[![James Woolfenden][jameswoolfenden_avatar]][jameswoolfenden_homepage]<br/>[James Woolfenden][jameswoolfenden_homepage]
+[![James Woolfenden][jameswoolfenden_avatar]][jameswoolfenden_homepage]<br/>[James Woolfenden][jameswoolfenden_homepage]<br>
 
+[![asottile][asottile_avatar]][asottile_homepage]<br/>[asottile][asottile_homepage]<br>
+
+[asottile homepage]: https://github.com/asottile
+[asottile_avatar]: https://github.com/asottile.png?size=150
 [jameswoolfenden_homepage]: https://github.com/jameswoolfenden
 [jameswoolfenden_avatar]: https://github.com/jameswoolfenden.png?size=150
