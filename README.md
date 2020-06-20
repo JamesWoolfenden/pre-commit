@@ -35,9 +35,9 @@ For Checkov-scan:
       files: \.tf$
 ```
 
-## Terraform-docs
+## tf2docs
 
-Updates README.md with parameters, modules.
+Updates README.md with Terraform parameters, modules.
 Requires:
 ```
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -50,7 +50,7 @@ The hook requires that [terraform-docs](https://github.com/segmentio/terraform-d
 - repo: git://github.com/jameswoolfenden/pre-commit
   rev: 0.0.22
   hooks:
-    - id: terraform-docs
+    - id: tf2docs
 ```
 
 ### Contributors
