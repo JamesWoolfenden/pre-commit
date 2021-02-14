@@ -19,6 +19,18 @@
   pass_filenames: false
   additional_dependencies: ['checkov']
 
+- id: tfsec-scan
+  name: tfsec
+  description: runs tfsec over a project, cross platform compatible
+  entry: tfsec-scan
+  language: python
+  language_version: python3.7
+  files: (\.tf)$
+  exclude: \.terraform\/.*$
+  always_run: false
+  pass_filenames: false
+  additional_dependencies: ['tfsec']
+
 - id: tf2docs
   name: tf2docs
   description: builds markdown docs, cross platform compatible 
