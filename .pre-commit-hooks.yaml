@@ -29,7 +29,6 @@
   exclude: \.terraform\/.*$
   always_run: false
   pass_filenames: false
-  additional_dependencies: ['tfsec']
 
 - id: tf2docs
   name: tf2docs
