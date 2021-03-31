@@ -11,7 +11,7 @@ setuptools.setup(
     name="pre-commit",
     description="Rewrite Terraform configuration files to a canonical format"
     "and style",
-    url="https://github.com/melmorabity/pre-commit-terraform-fmt",
+    url="https://github.com/jameswoolfenden/pre-commit-terraform-fmt",
     version="0.1.3",
     author=["Mohamed El Morabity", "James Woolfenden"],
     author_email="james.woolfenden@gmail.com",
@@ -23,6 +23,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     packages=setuptools.find_packages(exclude="tests"),
     setup_requires=["pytest-runner"],
@@ -32,6 +33,7 @@ setuptools.setup(
         "console_scripts": [
             "terraform-fmt = terraform.fmt:main",
             "checkov-scan = checkov.invoke:main",
+            "yor = yor.invoke:main",
             "tf2docs = tf2docs.invoke:main",
         ]
     },
