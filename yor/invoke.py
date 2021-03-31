@@ -7,7 +7,8 @@ import sys
 import os.path
 
 
-def run(folder):
+def run():
+    folder="example/examplea"
     """Run 'yor' command on a dir."""
     stdout = subprocess.run(
         ["yor", "tag -d", folder], shell=False, capture_output=False)
@@ -20,19 +21,7 @@ def run(folder):
 def main(argv=None):
     """Main execution path."""
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "folder",
-        nargs="*",
-        help="Folder to run the analysis over.",
-    )
-
-    parser.add_argument("-d", help="directory to run against")
-
-    args = parser.parse_args(argv)
-
-    return run(args.folder)
+    return run()
 
 
 if __name__ == "__main__":
