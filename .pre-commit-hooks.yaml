@@ -40,12 +40,3 @@
   exclude: \.terraform\/.*$
   always_run: false
   pass_filenames: false
-
-- id: yor
-  name: yor
-  description: tagging, cross platform compatible 
-  entry: yor
-  language: python
-  language_version: python3.7
-  always_run: false
-  pass_filenames: false
