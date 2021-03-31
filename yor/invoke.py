@@ -7,23 +7,13 @@ import sys
 import os.path
 
 
-def run(filenames):
+def run(folder):
     """Run 'yor' command on a dir."""
-    myrootfolder = ""
-    folders = []
-    for files in filenames:
-        folders.append(os.path.dirname(files))
-
-    myrootfolder = os.path.join(
-        os.path.abspath(min(folders, key=len, default=".")), ""
-    )
-
-
     stdout = subprocess.run(
-        ["yor", "tag -d", myrootfolder], shell=False, capture_output=False)
+        ["yor", "tag -d", folder], shell=False, capture_output=False)
 
     if stdout:
-        print("Analysed {}".format(myrootfolder), file=sys.stderr)
+        print("Analysed {}".format(folder), file=sys.stderr)
     return stdout.returncode
 
 
@@ -33,16 +23,16 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "filenames",
+        "folder",
         nargs="*",
-        help="Filenames pre-commit believes are changed.",
+        help="Folder to run the analysis over.",
     )
 
     parser.add_argument("-d", help="directory to run against")
 
     args = parser.parse_args(argv)
 
-    return run(args.filenames)
+    return run(args.folder)
 
 
 if __name__ == "__main__":
