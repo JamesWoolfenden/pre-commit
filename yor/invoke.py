@@ -20,7 +20,7 @@ def run(filenames):
 
 
     stdout = subprocess.run(
-        ["yor", "-d", myrootfolder], shell=False, capture_output=False)
+        ["yor", "tag --directory", myrootfolder], shell=False, capture_output=False)
 
     if stdout:
         print("Analysed {}".format(myrootfolder), file=sys.stderr)

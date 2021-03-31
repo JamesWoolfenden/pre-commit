@@ -11,7 +11,7 @@ setuptools.setup(
     name="pre-commit",
     description="Rewrite Terraform configuration files to a canonical format"
     "and style",
-    url="https://github.com/jameswoolfenden/pre-commit-terraform-fmt",
+    url="https://github.com/jameswoolfenden/pre-commit",
     version="0.1.3",
     author=["Mohamed El Morabity", "James Woolfenden"],
     author_email="james.woolfenden@gmail.com",
