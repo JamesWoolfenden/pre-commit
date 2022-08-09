@@ -53,6 +53,24 @@ The hook requires that [terraform-docs](https://github.com/segmentio/terraform-d
     - id: tf2docs
 ```
 
+## pike2docs
+
+Updates README.md with Terraform policy required to build this project.
+Requires:
+```
+<!-- BEGINNING OF PRE-COMMIT-PIKE DOCS HOOK -->
+<!-- END OF PRE-COMMIT-PIKE DOCS HOOK -->
+```
+The Hook will update in-betweeen with the Pike created content.
+The hook requires that [pike](https://github.com/jameswoolfenden/pike) be installed, then add a section to you pre-commit-config.yml, updating to the latest version :
+
+```yaml
+- repo: git://github.com/jameswoolfenden/pre-commit
+  rev: 0.0.22
+  hooks:
+    - id: pike2docs
+```
+
 ### Contributors
 [![James Woolfenden][jameswoolfenden_avatar]][jameswoolfenden_homepage]<br/>[James Woolfenden][jameswoolfenden_homepage]<br/>
 [![asottile][asottile_avatar]][asottile_homepage]<br/>[asottitle][asottile_homepage]<br/>

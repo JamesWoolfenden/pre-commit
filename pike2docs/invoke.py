@@ -45,8 +45,6 @@ def run(filenames):
         encoding=None,
     )
 
-    print(myrootfolder)
-
     reg = re.compile(
         "(?<=<!-- BEGINNING OF PRE-COMMIT-PIKE DOCS HOOK -->)"
         "(.*?)"
