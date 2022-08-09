@@ -41,10 +41,10 @@
   always_run: false
   pass_filenames: false
 
-- id: pike2docs
-  name: pike2docs
+- id: pike
+  name: pike
   description: builds markdown docs, cross platform compatible
-  entry: pike2docs
+  entry: pike
   language: python
   language_version: python3.10
   files: (\.tf)$
