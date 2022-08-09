@@ -1,6 +1,6 @@
 # pre-commit
 
-[![Build Status](https://github.com/JamesWoolfenden/pre-commit/workflows/Verify%20and%20Bump/badge.svg?branch=master)](https://github.com/JamesWoolfenden/pre-commit) 
+[![Build Status](https://github.com/JamesWoolfenden/pre-commit/workflows/Verify%20and%20Bump/badge.svg?branch=master)](https://github.com/JamesWoolfenden/pre-commit)
 [![Latest Release](https://img.shields.io/github/release/JamesWoolfenden/pre-commit.svg)](https://github.com/JamesWoolfenden/pre-commit/releases/latest)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
@@ -56,7 +56,6 @@ The hook requires that [terraform-docs](https://github.com/segmentio/terraform-d
 ### Contributors
 [![James Woolfenden][jameswoolfenden_avatar]][jameswoolfenden_homepage]<br/>[James Woolfenden][jameswoolfenden_homepage]<br/>
 [![asottile][asottile_avatar]][asottile_homepage]<br/>[asottitle][asottile_homepage]<br/>
-
 
 [asottile_homepage]: https://github.com/asottile
 [asottile_avatar]: https://github.com/asottile.png?size=150

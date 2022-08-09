@@ -32,8 +32,19 @@
 
 - id: tf2docs
   name: tf2docs
-  description: builds markdown docs, cross platform compatible 
+  description: builds markdown docs, cross platform compatible
   entry: tf2docs
+  language: python
+  language_version: python3.7
+  files: (\.tf)$
+  exclude: \.terraform\/.*$
+  always_run: false
+  pass_filenames: false
+
+- id: pike2docs
+  name: pike2docs
+  description: builds markdown docs, cross platform compatible
+  entry: pike2docs
   language: python
   language_version: python3.7
   files: (\.tf)$
