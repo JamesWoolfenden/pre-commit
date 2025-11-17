@@ -5,6 +5,7 @@
 
 import os
 import filecmp
+import shutil
 
 import pytest
 
@@ -13,10 +14,18 @@ import terraform.fmt
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 
+@pytest.fixture(scope="session")
+def terraform_available():
+    """Check if terraform binary is available."""
+    return shutil.which("terraform") is not None
+
+
 @pytest.mark.datafiles(os.path.join(DATA_DIR, "ok", "formatted"))
-def test_terraform_fmt_formatted(datafiles):
+def test_terraform_fmt_formatted(datafiles, terraform_available):
     """Verify that valid and well-formatted Terraform files are successfully
     parsed and not modified."""
+    if not terraform_available:
+        pytest.skip("terraform binary not available")
 
     files = [str(f) for f in datafiles.iterdir()]
     return_code = terraform.fmt.run(files)
@@ -31,9 +40,11 @@ def test_terraform_fmt_formatted(datafiles):
 
 
 @pytest.mark.datafiles(os.path.join(DATA_DIR, "ok", "unformatted"))
-def test_terraform_fmt_unformatted(datafiles):
+def test_terraform_fmt_unformatted(datafiles, terraform_available):
     """Verify that valid and unformatted Terraform files are successfully
     parsed and modified."""
+    if not terraform_available:
+        pytest.skip("terraform binary not available")
 
     files = [str(f) for f in datafiles.iterdir()]
     return_code = terraform.fmt.run(files)
@@ -55,8 +66,10 @@ def test_terraform_fmt_unformatted(datafiles):
 
 
 @pytest.mark.datafiles(os.path.join(DATA_DIR, "ko"))
-def test_terraform_fmt_ko(datafiles):
+def test_terraform_fmt_ko(datafiles, terraform_available):
     """Verify that invalid Terraform files are not modified."""
+    if not terraform_available:
+        pytest.skip("terraform binary not available")
 
     files = [str(f) for f in datafiles.iterdir()]
     return_code = terraform.fmt.run(files)

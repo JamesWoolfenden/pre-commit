@@ -34,7 +34,7 @@ def run(filenames, terraform=None):
                 print("reformatted {}".format(path), file=sys.stderr)
         except subprocess.CalledProcessError:
             invalid = True
-        except IOError as ex:
+        except (IOError, OSError) as ex:
             print(ex, file=sys.stderr)
             invalid = True
             break
