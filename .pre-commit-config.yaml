@@ -22,3 +22,11 @@ repos:
     rev: v4.4.0
     hooks:
       - id: validate_manifest
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'python3 -m pytest tests/ -v'
+        language: system
+        pass_filenames: false
+        always_run: true
