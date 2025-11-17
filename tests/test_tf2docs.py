@@ -215,6 +215,12 @@ def test_run_terraform_docs_failure():
         assert return_code == 1
 
 
+def test_run_no_filenames():
+    """Verify hook exits early when no filenames are provided."""
+    return_code = tf2docs.invoke.run([])
+    assert return_code == 0
+
+
 def test_main():
     """Test the main entry point."""
     with tempfile.TemporaryDirectory() as tmpdir:

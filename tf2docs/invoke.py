@@ -37,14 +37,15 @@ def writeme(readmefile, block):
 
 def run(filenames):
     """Run terraform-docs and update README.md with generated documentation."""
+    if not filenames:
+        return 0
+
     myrootfolder = None
     folders = []
     for files in filenames:
         folders.append(os.path.dirname(files))
 
-    myrootfolder = os.path.join(
-        os.path.abspath(min(folders, key=len, default=".")), ""
-    )
+    myrootfolder = os.path.join(os.path.abspath(min(folders, key=len)), "")
 
     readmepath = os.path.join(myrootfolder, readmefile)
 
