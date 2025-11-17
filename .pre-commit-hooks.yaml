@@ -12,7 +12,6 @@
   description: runs checkov over a project, cross platform compatible
   entry: checkov-scan
   language: python
-  language_version: python3.7
   files: (\.tf)$
   exclude: \.terraform\/.*$
   always_run: false
@@ -24,7 +23,6 @@
   description: builds markdown docs, cross platform compatible
   entry: tf2docs
   language: python
-  language_version: python3.7
   files: (\.tf)$
   exclude: \.terraform\/.*$
   always_run: false

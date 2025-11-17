@@ -9,29 +9,51 @@ import os.path
 
 def run(filenames):
     """Run 'checkov' command on a dir."""
+    if not filenames:
+        print("Error: No files provided to scan", file=sys.stderr)
+        return 1
+
     myrootfolder = ""
     folders = []
     for files in filenames:
-        folders.append(os.path.dirname(files))
+        folder = os.path.dirname(files)
+        if folder:
+            folders.append(folder)
+
+    if not folders:
+        folders.append(".")
 
     myrootfolder = os.path.join(
         os.path.abspath(min(folders, key=len, default=".")), ""
     )
 
-    if os.name == "nt":
-        stdout = subprocess.run(
-            ["checkov.cmd", "-d", myrootfolder],
+    if not os.path.isdir(myrootfolder):
+        print(f"Error: Directory not found: {myrootfolder}", file=sys.stderr)
+        return 1
+
+    checkov_cmd = "checkov.cmd" if os.name == "nt" else "checkov"
+
+    try:
+        result = subprocess.run(
+            [checkov_cmd, "-d", myrootfolder],
             shell=False,
             capture_output=False,
+            check=False,
         )
-    else:
-        stdout = subprocess.run(
-            ["checkov", "-d", myrootfolder], shell=False, capture_output=False
+    except FileNotFoundError:
+        print(
+            f"Error: {checkov_cmd} command not found.\n"
+            "Please install checkov: pip install checkov\n"
+            "Or ensure it is available in your PATH.",
+            file=sys.stderr,
         )
+        return 1
+    except Exception as e:
+        print(f"Error running checkov: {e}", file=sys.stderr)
+        return 1
 
-    if stdout:
-        print("Analysed {}".format(myrootfolder), file=sys.stderr)
-    return stdout.returncode
+    print("Analysed {}".format(myrootfolder), file=sys.stderr)
+    return result.returncode
 
 
 def main(argv=None):
