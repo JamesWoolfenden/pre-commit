@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(python3 -m pytest tests/ -v)",
-      "Bash(python3 -m pytest tests/ -v -o addopts=\"\")"
+      "Bash(python3 -m pytest tests/ -v -o addopts=\"\")",
+      "Bash(python3 -m pytest tests/test_fmt.py -v -o addopts=\"\")"
     ],
     "deny": [],
     "ask": []
