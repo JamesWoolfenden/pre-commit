@@ -20,10 +20,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Install OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: "1.5.0"
+          tofu_version: "latest"
+          tofu_wrapper: false
 
       - name: Install dependencies
         run: |

@@ -16,8 +16,11 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 @pytest.fixture(scope="session")
 def terraform_available():
-    """Check if terraform binary is available."""
-    return shutil.which("terraform") is not None
+    """Check if terraform or tofu binary is available."""
+    return (
+        shutil.which("tofu") is not None
+        or shutil.which("terraform") is not None
+    )
 
 
 @pytest.mark.datafiles(os.path.join(DATA_DIR, "ok", "formatted"))

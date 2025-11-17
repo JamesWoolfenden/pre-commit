@@ -10,10 +10,16 @@ import sys
 
 
 def run(filenames, terraform=None):
-    """Run 'terraform fmt' command on a set of files."""
+    """Run 'terraform fmt' or 'tofu fmt' command on a set of files."""
 
     if not terraform:
-        terraform = "terraform"
+        # Try tofu first (OpenTofu), fall back to terraform
+        import shutil
+
+        if shutil.which("tofu"):
+            terraform = "tofu"
+        else:
+            terraform = "terraform"
 
     invalid = False
     command = [
@@ -28,12 +34,16 @@ def run(filenames, terraform=None):
     # terraform 'fmt' command only takes one file at a time
     for path in filenames:
         try:
-            stdout = subprocess.check_output(command + [path])
+            stdout = subprocess.check_output(
+                command + [path], stderr=subprocess.STDOUT
+            )
             if stdout:
                 invalid = True
                 print("reformatted {}".format(path), file=sys.stderr)
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as ex:
             invalid = True
+            if ex.output:
+                print(ex.output.decode(), file=sys.stderr, end="")
         except (IOError, OSError) as ex:
             print(ex, file=sys.stderr)
             invalid = True
@@ -52,7 +62,7 @@ def main(argv=None):
         help="Filenames pre-commit believes are changed.",
     )
     parser.add_argument(
-        "--terraform", help="Path to the Terraform executable."
+        "--terraform", help="Path to the Terraform or OpenTofu executable."
     )
 
     args = parser.parse_args(argv)
