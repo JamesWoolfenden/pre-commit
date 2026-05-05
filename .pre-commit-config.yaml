@@ -1,14 +1,14 @@
 ---
 repos:
   - repo: https://github.com/ambv/black
-    rev: 25.11.0
+    rev: c6755bb741b6481d6b3d3bb563c83fa060db96c9 # 26.3.1
     hooks:
       - id: black
         args:
           - --line-length=79
         language_version: python3
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
     hooks:
       - id: check-docstring-first
       - id: check-merge-conflict
@@ -19,7 +19,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v4.4.0
+    rev: f35134b05028ec938ac605ae500fdf95462655d3 # v4.6.0
     hooks:
       - id: validate_manifest
   - repo: local
