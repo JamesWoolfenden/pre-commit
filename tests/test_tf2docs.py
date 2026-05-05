@@ -11,6 +11,100 @@ import pytest
 import tf2docs.invoke
 
 
+def test_binary_found_on_path():
+    """Verify _terraform_docs_binary returns the PATH binary when present."""
+    with mock.patch("shutil.which", return_value="/usr/bin/terraform-docs"):
+        result = tf2docs.invoke._terraform_docs_binary()
+    assert result == "/usr/bin/terraform-docs"
+
+
+def test_binary_cached_in_install_dir():
+    """Verify cached binary is returned without downloading."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        install_dir = os.path.join(tmpdir, ".terraform-docs", "bin")
+        os.makedirs(install_dir)
+        cached = os.path.join(install_dir, "terraform-docs")
+        open(cached, "w").close()
+
+        with mock.patch("shutil.which", return_value=None), mock.patch(
+            "os.path.expanduser", return_value=tmpdir
+        ), mock.patch("urllib.request.urlretrieve") as mock_dl:
+            result = tf2docs.invoke._terraform_docs_binary()
+
+        mock_dl.assert_not_called()
+        assert result == cached
+
+
+def test_binary_downloads_when_missing():
+    """Verify _terraform_docs_binary downloads and extracts the binary."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        install_dir = os.path.join(tmpdir, ".terraform-docs", "bin")
+        binary_path = os.path.join(install_dir, "terraform-docs")
+
+        mock_member = mock.Mock()
+        mock_member.name = "terraform-docs"
+        mock_tar = mock.MagicMock()
+        mock_tar.__enter__ = mock.Mock(return_value=mock_tar)
+        mock_tar.__exit__ = mock.Mock(return_value=False)
+        mock_tar.getmember.return_value = mock_member
+        mock_tar.extract.side_effect = lambda m, path: (
+            os.makedirs(path, exist_ok=True)
+            or open(os.path.join(path, "terraform-docs"), "w").close()
+        )
+
+        with mock.patch("shutil.which", return_value=None), mock.patch(
+            "os.path.expanduser", return_value=tmpdir
+        ), mock.patch("urllib.request.urlretrieve"), mock.patch(
+            "tarfile.open", return_value=mock_tar
+        ), mock.patch(
+            "os.chmod"
+        ):
+            result = tf2docs.invoke._terraform_docs_binary(version="v0.22.0")
+
+        assert result == binary_path
+
+
+def test_binary_uses_custom_version():
+    """Verify custom version is used in the download URL."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        captured_urls = []
+
+        def fake_retrieve(url, path):
+            captured_urls.append(url)
+
+        mock_member = mock.Mock()
+        mock_member.name = "terraform-docs"
+        mock_tar = mock.MagicMock()
+        mock_tar.__enter__ = mock.Mock(return_value=mock_tar)
+        mock_tar.__exit__ = mock.Mock(return_value=False)
+        mock_tar.getmember.return_value = mock_member
+        mock_tar.extract.side_effect = lambda m, path: (
+            os.makedirs(path, exist_ok=True)
+            or open(os.path.join(path, "terraform-docs"), "w").close()
+        )
+
+        with mock.patch("shutil.which", return_value=None), mock.patch(
+            "os.path.expanduser", return_value=tmpdir
+        ), mock.patch(
+            "urllib.request.urlretrieve", side_effect=fake_retrieve
+        ), mock.patch(
+            "tarfile.open", return_value=mock_tar
+        ), mock.patch(
+            "os.chmod"
+        ):
+            tf2docs.invoke._terraform_docs_binary(version="v0.19.0")
+
+        assert len(captured_urls) == 1
+        assert "v0.19.0" in captured_urls[0]
+
+
+def test_main_with_version_arg():
+    """Verify --terraform-docs-version arg is passed through to run()."""
+    with mock.patch("tf2docs.invoke.run", return_value=0) as mock_run:
+        tf2docs.invoke.main(["--terraform-docs-version", "v0.19.0"])
+    mock_run.assert_called_once_with([], version="v0.19.0")
+
+
 def test_readme_file_not_found():
     """Verify proper error when README file doesn't exist."""
     with pytest.raises(FileNotFoundError) as exc_info:
