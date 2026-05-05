@@ -6,9 +6,11 @@
 
 After <https://github.com/melmorabity/pre-commit-terraform-fmt>
 
-## Terraform-fmt
+## Terraform-fmt / Tofu-fmt
 
-A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform configuration files to a canonical format.
+A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform / OpenTofu configuration files to a canonical format.
+
+The hook auto-detects the binary: it prefers `tofu` (OpenTofu) if found on `PATH`, otherwise falls back to `terraform`. Matches `.tf`, `.tfvars`, `.tofu` and `.tofuvars` files. Use `tofu-fmt` or `terraform-fmt` as the hook id — both run the same implementation.
 
 `.pre-commit-config.yaml`:
 
@@ -16,9 +18,9 @@ A [pre-commit](https://pre-commit.com/) hook to rewrite Terraform configuration 
 - repo: git://github.com/jameswoolfenden/pre-commit
   rev: 0.0.1
   hooks:
-    - id: terraform-fmt
-      # Optional argument: path to the Terraform executable
-      # args: [--terraform=/usr/local/bin/terraform]
+    - id: tofu-fmt
+      # Optional: pin a specific binary
+      # args: [--terraform=/usr/local/bin/tofu]
 ```
 
 ## Checkov-scan

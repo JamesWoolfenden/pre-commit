@@ -2,9 +2,17 @@
 - id: terraform-fmt
   name: terraform-fmt
   entry: terraform-fmt
-  description: Rewrite Terraform configuration files to a canonical format and style, cross platform compatible
+  description: Rewrite Terraform/OpenTofu configuration files to a canonical format and style. Auto-detects tofu, falls back to terraform.
   language: python
-  files: (\.tf|\.tfvars)$
+  files: \.(tf|tfvars|tofu|tofuvars)$
+  exclude: \.terraform\/.*$
+
+- id: tofu-fmt
+  name: tofu-fmt
+  entry: tofu-fmt
+  description: Rewrite OpenTofu configuration files to a canonical format and style (alias of terraform-fmt, prefers tofu binary).
+  language: python
+  files: \.(tf|tfvars|tofu|tofuvars)$
   exclude: \.terraform\/.*$
 
 - id: checkov-scan
@@ -12,7 +20,7 @@
   description: runs checkov over a project, cross platform compatible
   entry: checkov-scan
   language: python
-  files: (\.tf)$
+  files: \.(tf|tofu)$
   exclude: \.terraform\/.*$
   always_run: false
   pass_filenames: false
@@ -23,7 +31,7 @@
   description: builds markdown docs, cross platform compatible
   entry: tf2docs
   language: python
-  files: (\.tf)$
+  files: \.(tf|tofu)$
   exclude: \.terraform\/.*$
   always_run: false
   pass_filenames: false

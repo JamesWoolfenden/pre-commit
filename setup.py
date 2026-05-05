@@ -32,6 +32,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "terraform-fmt = terraform.fmt:main",
+            "tofu-fmt = terraform.fmt:main",
             "checkov-scan = checkov.invoke:main",
             "tf2docs = tf2docs.invoke:main",
         ]
