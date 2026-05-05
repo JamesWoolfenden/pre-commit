@@ -84,7 +84,7 @@ def test_run_missing_markers():
 
 
 def test_run_terraform_docs_not_found():
-    """Verify error when terraform-docs is not installed."""
+    """Verify error when terraform-docs cannot be found or installed."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create a terraform file
         test_file = os.path.join(tmpdir, "main.tf")
@@ -100,11 +100,10 @@ def test_run_terraform_docs_not_found():
                 "<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\n"
             )
 
-        # Mock subprocess to raise FileNotFoundError
-        with mock.patch("subprocess.run") as mock_run:
-            mock_run.side_effect = FileNotFoundError(
-                "terraform-docs not found"
-            )
+        with mock.patch(
+            "tf2docs.invoke._terraform_docs_binary"
+        ) as mock_binary:
+            mock_binary.side_effect = Exception("terraform-docs not found")
             return_code = tf2docs.invoke.run([test_file])
 
         assert return_code == 1

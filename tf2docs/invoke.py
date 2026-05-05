@@ -2,12 +2,62 @@
 """terraform-docs"""
 
 import argparse
-import subprocess
 import os.path
+import platform
 import re
+import shutil
+import subprocess
 import sys
+import tarfile
+import tempfile
+import urllib.request
 
 readmefile = "README.md"
+
+TERRAFORM_DOCS_VERSION = "v0.22.0"
+
+
+def _terraform_docs_binary():
+    """Return path to terraform-docs, downloading it if not on PATH."""
+    binary = shutil.which("terraform-docs")
+    if binary:
+        return binary
+
+    system = platform.system().lower()
+    arch = platform.machine().lower()
+    if arch == "x86_64":
+        arch = "amd64"
+    elif arch in ("arm64", "aarch64"):
+        arch = "arm64"
+
+    install_dir = os.path.join(
+        os.path.expanduser("~"), ".terraform-docs", "bin"
+    )
+    binary_path = os.path.join(install_dir, "terraform-docs")
+    if os.path.isfile(binary_path):
+        return binary_path
+
+    os.makedirs(install_dir, exist_ok=True)
+    filename = (
+        f"terraform-docs-{TERRAFORM_DOCS_VERSION}-{system}-{arch}.tar.gz"
+    )
+    url = (
+        f"https://github.com/terraform-docs/terraform-docs/releases/download"
+        f"/{TERRAFORM_DOCS_VERSION}/{filename}"
+    )
+    print(
+        f"Downloading terraform-docs {TERRAFORM_DOCS_VERSION}...",
+        file=sys.stderr,
+    )
+    with tempfile.TemporaryDirectory() as tmpdir:
+        archive = os.path.join(tmpdir, filename)
+        urllib.request.urlretrieve(url, archive)
+        with tarfile.open(archive) as tar:
+            member = tar.getmember("terraform-docs")
+            member.name = "terraform-docs"
+            tar.extract(member, path=install_dir)
+    os.chmod(binary_path, 0o755)
+    return binary_path
 
 
 def readme(readmefile):
@@ -40,13 +90,8 @@ def run(filenames):
     if not filenames:
         return 0
 
-    myrootfolder = None
-    folders = []
-    for files in filenames:
-        folders.append(os.path.dirname(files))
-
+    folders = [os.path.dirname(f) for f in filenames]
     myrootfolder = os.path.join(os.path.abspath(min(folders, key=len)), "")
-
     readmepath = os.path.join(myrootfolder, readmefile)
 
     try:
@@ -55,7 +100,6 @@ def run(filenames):
         print(f"Error: {e}", file=sys.stderr)
         return 1
 
-    # Check for required comment markers
     if (
         "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->" not in oldblock
         or "<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->" not in oldblock
@@ -70,22 +114,19 @@ def run(filenames):
         return 1
 
     try:
-        paramblock = subprocess.run(
-            ["terraform-docs", "md", myrootfolder],
-            shell=False,
-            text=True,
-            capture_output=True,
-            encoding=None,
-            check=False,
-        )
-    except FileNotFoundError:
-        print(
-            "Error: terraform-docs command not found.\n"
-            "Please install terraform-docs: \n"
-            "   https://github.com/terraform-docs/terraform-docs",
-            file=sys.stderr,
-        )
+        binary = _terraform_docs_binary()
+    except Exception as e:
+        print(f"Error installing terraform-docs: {e}", file=sys.stderr)
         return 1
+
+    paramblock = subprocess.run(
+        [binary, "md", myrootfolder],
+        shell=False,
+        text=True,
+        capture_output=True,
+        encoding=None,
+        check=False,
+    )
 
     if paramblock.returncode != 0:
         print(
@@ -118,17 +159,13 @@ def run(filenames):
 
 def main(argv=None):
     """Main execution path."""
-
     parser = argparse.ArgumentParser()
-
     parser.add_argument(
         "filenames",
         nargs="*",
         help="Filenames pre-commit believes are changed.",
     )
-
     args = parser.parse_args(argv)
-
     return run(args.filenames)
 
 
