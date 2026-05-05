@@ -17,7 +17,7 @@ readmefile = "README.md"
 TERRAFORM_DOCS_VERSION = "v0.22.0"
 
 
-def _terraform_docs_binary():
+def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
     """Return path to terraform-docs, downloading it if not on PATH."""
     binary = shutil.which("terraform-docs")
     if binary:
@@ -38,17 +38,12 @@ def _terraform_docs_binary():
         return binary_path
 
     os.makedirs(install_dir, exist_ok=True)
-    filename = (
-        f"terraform-docs-{TERRAFORM_DOCS_VERSION}-{system}-{arch}.tar.gz"
-    )
+    filename = f"terraform-docs-{version}-{system}-{arch}.tar.gz"
     url = (
         f"https://github.com/terraform-docs/terraform-docs/releases/download"
-        f"/{TERRAFORM_DOCS_VERSION}/{filename}"
+        f"/{version}/{filename}"
     )
-    print(
-        f"Downloading terraform-docs {TERRAFORM_DOCS_VERSION}...",
-        file=sys.stderr,
-    )
+    print(f"Downloading terraform-docs {version}...", file=sys.stderr)
     with tempfile.TemporaryDirectory() as tmpdir:
         archive = os.path.join(tmpdir, filename)
         urllib.request.urlretrieve(url, archive)
@@ -85,7 +80,7 @@ def writeme(readmefile, block):
         raise IOError(f"Error writing to {readmefile}: {e}")
 
 
-def run(filenames):
+def run(filenames, version=TERRAFORM_DOCS_VERSION):
     """Run terraform-docs and update README.md with generated documentation."""
     if not filenames:
         return 0
@@ -114,7 +109,7 @@ def run(filenames):
         return 1
 
     try:
-        binary = _terraform_docs_binary()
+        binary = _terraform_docs_binary(version=version)
     except Exception as e:
         print(f"Error installing terraform-docs: {e}", file=sys.stderr)
         return 1
@@ -165,8 +160,14 @@ def main(argv=None):
         nargs="*",
         help="Filenames pre-commit believes are changed.",
     )
+    parser.add_argument(
+        "--terraform-docs-version",
+        default=TERRAFORM_DOCS_VERSION,
+        help="terraform-docs version to download if not on PATH"
+        " (default: %(default)s)",
+    )
     args = parser.parse_args(argv)
-    return run(args.filenames)
+    return run(args.filenames, version=args.terraform_docs_version)
 
 
 if __name__ == "__main__":
