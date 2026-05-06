@@ -3,6 +3,7 @@
 """Unit testing module for tf2docs pre-commit hook."""
 
 import hashlib
+import io
 import os
 import tempfile
 from unittest import mock
@@ -36,8 +37,16 @@ def test_binary_cached_in_install_dir():
         assert result == cached
 
 
+def _fake_retrieve(payload):
+    def fn(url, path):
+        with open(path, "wb") as fh:
+            fh.write(payload)
+
+    return fn
+
+
 def test_binary_downloads_when_missing():
-    """Verify _terraform_docs_binary downloads, verifies and extracts."""
+    """Verify download, checksum, extract, atomic install on POSIX."""
     payload = b"fake-tarball"
     digest = hashlib.sha256(payload).hexdigest()
 
@@ -45,40 +54,63 @@ def test_binary_downloads_when_missing():
         install_dir = os.path.join(tmpdir, ".terraform-docs", "bin")
         binary_path = os.path.join(install_dir, "terraform-docs")
 
-        def fake_retrieve(url, path):
-            with open(path, "wb") as fh:
-                fh.write(payload)
-
-        mock_member = mock.Mock()
-        mock_member.name = "terraform-docs"
         mock_tar = mock.MagicMock()
-        mock_tar.__enter__ = mock.Mock(return_value=mock_tar)
-        mock_tar.__exit__ = mock.Mock(return_value=False)
-        mock_tar.getmember.return_value = mock_member
-        mock_tar.extract.side_effect = lambda m, path: (
-            os.makedirs(path, exist_ok=True)
-            or open(os.path.join(path, "terraform-docs"), "w").close()
-        )
+        mock_tar.__enter__.return_value = mock_tar
+        mock_tar.extractfile.return_value = io.BytesIO(b"elf")
 
         with mock.patch("shutil.which", return_value=None), mock.patch(
             "os.path.expanduser", return_value=tmpdir
-        ), mock.patch(
-            "platform.system", return_value="Linux"
-        ), mock.patch(
+        ), mock.patch("platform.system", return_value="Linux"), mock.patch(
             "platform.machine", return_value="x86_64"
         ), mock.patch.dict(
             tf2docs.invoke.TERRAFORM_DOCS_SHA256,
             {("linux", "amd64"): digest},
         ), mock.patch(
-            "urllib.request.urlretrieve", side_effect=fake_retrieve
+            "urllib.request.urlretrieve", side_effect=_fake_retrieve(payload)
         ), mock.patch(
             "tarfile.open", return_value=mock_tar
-        ), mock.patch(
-            "os.chmod"
         ):
             result = tf2docs.invoke._terraform_docs_binary()
 
         assert result == binary_path
+        assert os.path.isfile(binary_path)
+        assert not any(
+            f.endswith(".tmp") for f in os.listdir(install_dir)
+        )  # staging file was atomically replaced
+
+
+def test_binary_downloads_windows():
+    """Verify Windows path: .exe suffix, zip extraction, no chmod."""
+    payload = b"fake-zip"
+    digest = hashlib.sha256(payload).hexdigest()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        install_dir = os.path.join(tmpdir, ".terraform-docs", "bin")
+        binary_path = os.path.join(install_dir, "terraform-docs.exe")
+
+        mock_zip = mock.MagicMock()
+        mock_zip.__enter__.return_value = mock_zip
+        mock_zip.open.return_value = io.BytesIO(b"MZ")
+
+        with mock.patch("shutil.which", return_value=None), mock.patch(
+            "os.path.expanduser", return_value=tmpdir
+        ), mock.patch("platform.system", return_value="Windows"), mock.patch(
+            "platform.machine", return_value="AMD64"
+        ), mock.patch.dict(
+            tf2docs.invoke.TERRAFORM_DOCS_SHA256,
+            {("windows", "amd64"): digest},
+        ), mock.patch(
+            "urllib.request.urlretrieve", side_effect=_fake_retrieve(payload)
+        ), mock.patch(
+            "zipfile.ZipFile", return_value=mock_zip
+        ), mock.patch(
+            "os.chmod"
+        ) as mock_chmod:
+            result = tf2docs.invoke._terraform_docs_binary()
+
+        assert result == binary_path
+        assert os.path.isfile(binary_path)
+        mock_chmod.assert_not_called()
 
 
 def test_binary_checksum_mismatch():
@@ -91,9 +123,7 @@ def test_binary_checksum_mismatch():
 
         with mock.patch("shutil.which", return_value=None), mock.patch(
             "os.path.expanduser", return_value=tmpdir
-        ), mock.patch(
-            "platform.system", return_value="Linux"
-        ), mock.patch(
+        ), mock.patch("platform.system", return_value="Linux"), mock.patch(
             "platform.machine", return_value="x86_64"
         ), mock.patch.dict(
             tf2docs.invoke.TERRAFORM_DOCS_SHA256,

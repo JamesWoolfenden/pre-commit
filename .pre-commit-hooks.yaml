@@ -35,3 +35,4 @@
   exclude: \.terraform\/.*$
   always_run: false
   pass_filenames: true
+  require_serial: true

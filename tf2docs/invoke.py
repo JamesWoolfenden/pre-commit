@@ -12,18 +12,23 @@ import sys
 import tarfile
 import tempfile
 import urllib.request
+import zipfile
 
 readmefile = "README.md"
 
 TERRAFORM_DOCS_VERSION = "v0.23.0"
 
 # From terraform-docs-v0.23.0.sha256sum — release assets are mutable, so verify.
+# fmt: off
 TERRAFORM_DOCS_SHA256 = {
     ("darwin", "amd64"): "b47e2087d558df3bd79b7ae67983b310d2e3db8c7b6dcd543249a757b48ed4c3",  # noqa: E501
     ("darwin", "arm64"): "2a91629a37392f545a96c63d69e2c98822cd69f284e81e7dab2e30b15d2911a4",  # noqa: E501
     ("linux", "amd64"): "80b8cd1d08b44e1182a39177adafc6901650a22e0a7f52cfeffcdbd44e8b0938",  # noqa: E501
     ("linux", "arm64"): "f3be6f09fb0913c752b78480fac1eb4916e9ee50da7e3eb0bdaa356d80ed16b5",  # noqa: E501
+    ("windows", "amd64"): "f789b747da9e373012f2e3ceeb7802572f1893adad3c97bd66bc5dfa34b341b1",  # noqa: E501
+    ("windows", "arm64"): "d29faa8629f22eeb6718a78302ebca115f73532986a2a71280321d3f49327cff",  # noqa: E501
 }
+# fmt: on
 
 
 def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
@@ -34,15 +39,16 @@ def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
 
     system = platform.system().lower()
     arch = platform.machine().lower()
-    if arch == "x86_64":
+    if arch in ("x86_64", "amd64"):
         arch = "amd64"
     elif arch in ("arm64", "aarch64"):
         arch = "arm64"
+    exe = ".exe" if system == "windows" else ""
 
     install_dir = os.path.join(
         os.path.expanduser("~"), ".terraform-docs", "bin"
     )
-    binary_path = os.path.join(install_dir, "terraform-docs")
+    binary_path = os.path.join(install_dir, "terraform-docs" + exe)
     if os.path.isfile(binary_path):
         return binary_path
 
@@ -54,7 +60,8 @@ def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
         )
 
     os.makedirs(install_dir, exist_ok=True)
-    filename = f"terraform-docs-{version}-{system}-{arch}.tar.gz"
+    ext = "zip" if system == "windows" else "tar.gz"
+    filename = f"terraform-docs-{version}-{system}-{arch}.{ext}"
     url = (
         f"https://github.com/terraform-docs/terraform-docs/releases/download"
         f"/{version}/{filename}"
@@ -70,11 +77,26 @@ def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
                 f"terraform-docs checksum mismatch for {filename}: "
                 f"expected {want}, got {got}"
             )
-        with tarfile.open(archive) as tar:
-            member = tar.getmember("terraform-docs")
-            member.name = "terraform-docs"
-            tar.extract(member, path=install_dir)
-    os.chmod(binary_path, 0o755)
+        staged = f"{binary_path}.{os.getpid()}.tmp"
+        if system == "windows":
+            with zipfile.ZipFile(archive) as zf:
+                with zf.open("terraform-docs.exe") as src, open(
+                    staged, "wb"
+                ) as dst:
+                    shutil.copyfileobj(src, dst)
+        else:
+            with tarfile.open(archive) as tar:
+                with tar.extractfile("terraform-docs") as src, open(
+                    staged, "wb"
+                ) as dst:
+                    shutil.copyfileobj(src, dst)
+            os.chmod(staged, 0o755)
+    try:
+        os.replace(staged, binary_path)
+    except OSError:
+        os.remove(staged)
+        if not os.path.isfile(binary_path):
+            raise
     return binary_path
 
 
