@@ -146,7 +146,7 @@ def test_writeme_success():
 
 
 def test_run_missing_readme():
-    """Verify error when README.md is missing."""
+    """Verify directory without README.md is skipped silently."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create a terraform file in a subdirectory
         test_dir = os.path.join(tmpdir, "terraform")
@@ -157,11 +157,11 @@ def test_run_missing_readme():
             f.write("# terraform file")
 
         return_code = tf2docs.invoke.run([test_file])
-        assert return_code == 1
+        assert return_code == 0
 
 
 def test_run_missing_markers():
-    """Verify error when README.md is missing required comment markers."""
+    """Verify README.md without markers is skipped silently."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create a terraform file
         test_file = os.path.join(tmpdir, "main.tf")
@@ -174,7 +174,7 @@ def test_run_missing_markers():
             f.write("# My Terraform Module\n\nNo markers here!")
 
         return_code = tf2docs.invoke.run([test_file])
-        assert return_code == 1
+        assert return_code == 0
 
 
 def test_run_terraform_docs_not_found():
@@ -236,7 +236,9 @@ def test_run_success_with_update():
             mock_run.return_value = mock_result
             return_code = tf2docs.invoke.run([test_file])
 
-        assert return_code == 0
+        assert (
+            return_code == 1
+        )  # non-zero signals pre-commit that files changed
 
         # Verify the README was updated
         with open(readme_path, "r") as f:
@@ -259,7 +261,7 @@ def test_run_no_update_needed():
         docs_content = "## Inputs\n\n| Name | Description |\n"
         original_content = (
             "# My Module\n"
-            "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\r\n"
+            "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\n"
             + docs_content
             + "<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\n"
         )
@@ -340,4 +342,6 @@ def test_main():
             mock_run.return_value = mock_result
             return_code = tf2docs.invoke.main([test_file])
 
-        assert return_code == 0
+        assert (
+            return_code == 1
+        )  # non-zero signals pre-commit that files changed

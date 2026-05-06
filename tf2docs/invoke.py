@@ -85,50 +85,11 @@ def run(filenames, version=TERRAFORM_DOCS_VERSION):
     if not filenames:
         return 0
 
-    folders = [os.path.dirname(f) for f in filenames]
-    myrootfolder = os.path.join(os.path.abspath(min(folders, key=len)), "")
-    readmepath = os.path.join(myrootfolder, readmefile)
-
-    try:
-        oldblock = readme(readmepath)
-    except (FileNotFoundError, IOError) as e:
-        print(f"Error: {e}", file=sys.stderr)
-        return 1
-
-    if (
-        "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->" not in oldblock
-        or "<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->" not in oldblock
-    ):
-        print(
-            f"Error: {readmepath} is missing required comment markers.\n"
-            "Please add the following to your README.md:\n"
-            "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\n"
-            "<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->",
-            file=sys.stderr,
-        )
-        return 1
-
     try:
         binary = _terraform_docs_binary(version=version)
     except Exception as e:
         print(f"Error installing terraform-docs: {e}", file=sys.stderr)
         return 1
-
-    paramblock = subprocess.run(
-        [binary, "md", myrootfolder],
-        shell=False,
-        text=True,
-        capture_output=True,
-        encoding=None,
-        check=False,
-    )
-
-    if paramblock.returncode != 0:
-        print(
-            f"Error running terraform-docs: {paramblock.stderr}",
-            file=sys.stderr,
-        )
-        return paramblock.returncode
 
     reg = re.compile(
         "(?<=<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->)"
@@ -137,19 +98,66 @@ def run(filenames, version=TERRAFORM_DOCS_VERSION):
         re.DOTALL,
     )
 
-    nublock = reg.sub("\n" + paramblock.stdout, oldblock)
-    if nublock == oldblock:
-        print("No update")
-        return 0
+    # Collect unique directories, preserving shortest-first order so a repo
+    # root is processed before its subdirectories.
+    seen = set()
+    folders = []
+    for f in filenames:
+        d = os.path.abspath(os.path.dirname(f))
+        if d not in seen:
+            seen.add(d)
+            folders.append(d)
+    folders.sort(key=len)
 
-    try:
-        writeme(readmepath, nublock)
-    except IOError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        return 1
+    ret = 0
+    for folder in folders:
+        readmepath = os.path.join(folder, readmefile)
+        try:
+            oldblock = readme(readmepath)
+        except FileNotFoundError:
+            continue  # no README in this directory — skip silently
+        except IOError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            ret = 1
+            continue
 
-    print(f"Updated {readmepath}")
-    return 0
+        if (
+            "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->"
+            not in oldblock
+            or "<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->" not in oldblock
+        ):
+            continue  # markers absent — not our README to manage
+
+        paramblock = subprocess.run(
+            [binary, "md", os.path.join(folder, "")],
+            shell=False,
+            text=True,
+            capture_output=True,
+            encoding=None,
+            check=False,
+        )
+
+        if paramblock.returncode != 0:
+            print(
+                f"Error running terraform-docs: {paramblock.stderr}",
+                file=sys.stderr,
+            )
+            ret = paramblock.returncode
+            continue
+
+        nublock = reg.sub("\n" + paramblock.stdout, oldblock)
+        if nublock == oldblock:
+            continue
+
+        try:
+            writeme(readmepath, nublock)
+            print(f"Updated {readmepath}")
+            ret = 1  # signal pre-commit that files were modified
+        except IOError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            ret = 1
+
+    return ret
 
 
 def main(argv=None):
