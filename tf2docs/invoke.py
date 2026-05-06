@@ -137,7 +137,7 @@ def run(filenames, version=TERRAFORM_DOCS_VERSION):
         re.DOTALL,
     )
 
-    nublock = reg.sub("\r\n" + paramblock.stdout, oldblock)
+    nublock = reg.sub("\n" + paramblock.stdout, oldblock)
     if nublock == oldblock:
         print("No update")
         return 0

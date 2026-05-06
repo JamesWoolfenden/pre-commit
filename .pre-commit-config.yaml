@@ -14,7 +14,6 @@ repos:
       - id: check-merge-conflict
       - id: check-yaml
       - id: end-of-file-fixer
-      - id: fix-encoding-pragma
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/pre-commit/pre-commit
