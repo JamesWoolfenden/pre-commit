@@ -14,7 +14,7 @@ import urllib.request
 
 readmefile = "README.md"
 
-TERRAFORM_DOCS_VERSION = "v0.22.0"
+TERRAFORM_DOCS_VERSION = "v0.23.0"
 
 
 def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
@@ -129,7 +129,7 @@ def run(filenames, version=TERRAFORM_DOCS_VERSION):
             continue  # markers absent — not our README to manage
 
         paramblock = subprocess.run(
-            [binary, "md", os.path.join(folder, "")],
+            [binary, "md", "--lockfile=false", os.path.join(folder, "")],
             shell=False,
             text=True,
             capture_output=True,
