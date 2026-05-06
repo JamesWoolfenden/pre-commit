@@ -2,6 +2,7 @@
 
 """Unit testing module for tf2docs pre-commit hook."""
 
+import hashlib
 import os
 import tempfile
 from unittest import mock
@@ -36,41 +37,17 @@ def test_binary_cached_in_install_dir():
 
 
 def test_binary_downloads_when_missing():
-    """Verify _terraform_docs_binary downloads and extracts the binary."""
+    """Verify _terraform_docs_binary downloads, verifies and extracts."""
+    payload = b"fake-tarball"
+    digest = hashlib.sha256(payload).hexdigest()
+
     with tempfile.TemporaryDirectory() as tmpdir:
         install_dir = os.path.join(tmpdir, ".terraform-docs", "bin")
         binary_path = os.path.join(install_dir, "terraform-docs")
 
-        mock_member = mock.Mock()
-        mock_member.name = "terraform-docs"
-        mock_tar = mock.MagicMock()
-        mock_tar.__enter__ = mock.Mock(return_value=mock_tar)
-        mock_tar.__exit__ = mock.Mock(return_value=False)
-        mock_tar.getmember.return_value = mock_member
-        mock_tar.extract.side_effect = lambda m, path: (
-            os.makedirs(path, exist_ok=True)
-            or open(os.path.join(path, "terraform-docs"), "w").close()
-        )
-
-        with mock.patch("shutil.which", return_value=None), mock.patch(
-            "os.path.expanduser", return_value=tmpdir
-        ), mock.patch("urllib.request.urlretrieve"), mock.patch(
-            "tarfile.open", return_value=mock_tar
-        ), mock.patch(
-            "os.chmod"
-        ):
-            result = tf2docs.invoke._terraform_docs_binary(version="v0.22.0")
-
-        assert result == binary_path
-
-
-def test_binary_uses_custom_version():
-    """Verify custom version is used in the download URL."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        captured_urls = []
-
         def fake_retrieve(url, path):
-            captured_urls.append(url)
+            with open(path, "wb") as fh:
+                fh.write(payload)
 
         mock_member = mock.Mock()
         mock_member.name = "terraform-docs"
@@ -85,6 +62,13 @@ def test_binary_uses_custom_version():
 
         with mock.patch("shutil.which", return_value=None), mock.patch(
             "os.path.expanduser", return_value=tmpdir
+        ), mock.patch(
+            "platform.system", return_value="Linux"
+        ), mock.patch(
+            "platform.machine", return_value="x86_64"
+        ), mock.patch.dict(
+            tf2docs.invoke.TERRAFORM_DOCS_SHA256,
+            {("linux", "amd64"): digest},
         ), mock.patch(
             "urllib.request.urlretrieve", side_effect=fake_retrieve
         ), mock.patch(
@@ -92,10 +76,42 @@ def test_binary_uses_custom_version():
         ), mock.patch(
             "os.chmod"
         ):
-            tf2docs.invoke._terraform_docs_binary(version="v0.19.0")
+            result = tf2docs.invoke._terraform_docs_binary()
 
-        assert len(captured_urls) == 1
-        assert "v0.19.0" in captured_urls[0]
+        assert result == binary_path
+
+
+def test_binary_checksum_mismatch():
+    """Verify download is rejected when checksum doesn't match."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+
+        def fake_retrieve(url, path):
+            with open(path, "wb") as fh:
+                fh.write(b"tampered")
+
+        with mock.patch("shutil.which", return_value=None), mock.patch(
+            "os.path.expanduser", return_value=tmpdir
+        ), mock.patch(
+            "platform.system", return_value="Linux"
+        ), mock.patch(
+            "platform.machine", return_value="x86_64"
+        ), mock.patch.dict(
+            tf2docs.invoke.TERRAFORM_DOCS_SHA256,
+            {("linux", "amd64"): "0" * 64},
+        ), mock.patch(
+            "urllib.request.urlretrieve", side_effect=fake_retrieve
+        ), pytest.raises(
+            RuntimeError, match="checksum mismatch"
+        ):
+            tf2docs.invoke._terraform_docs_binary()
+
+
+def test_binary_custom_version_refused():
+    """Verify a non-pinned version refuses to download (no checksum)."""
+    with mock.patch("shutil.which", return_value=None), mock.patch(
+        "os.path.isfile", return_value=False
+    ), pytest.raises(RuntimeError, match="no pinned checksum"):
+        tf2docs.invoke._terraform_docs_binary(version="v0.19.0")
 
 
 def test_main_with_version_arg():

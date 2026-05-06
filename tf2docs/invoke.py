@@ -2,6 +2,7 @@
 """terraform-docs"""
 
 import argparse
+import hashlib
 import os.path
 import platform
 import re
@@ -15,6 +16,14 @@ import urllib.request
 readmefile = "README.md"
 
 TERRAFORM_DOCS_VERSION = "v0.23.0"
+
+# From terraform-docs-v0.23.0.sha256sum — release assets are mutable, so verify.
+TERRAFORM_DOCS_SHA256 = {
+    ("darwin", "amd64"): "b47e2087d558df3bd79b7ae67983b310d2e3db8c7b6dcd543249a757b48ed4c3",  # noqa: E501
+    ("darwin", "arm64"): "2a91629a37392f545a96c63d69e2c98822cd69f284e81e7dab2e30b15d2911a4",  # noqa: E501
+    ("linux", "amd64"): "80b8cd1d08b44e1182a39177adafc6901650a22e0a7f52cfeffcdbd44e8b0938",  # noqa: E501
+    ("linux", "arm64"): "f3be6f09fb0913c752b78480fac1eb4916e9ee50da7e3eb0bdaa356d80ed16b5",  # noqa: E501
+}
 
 
 def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
@@ -37,6 +46,13 @@ def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
     if os.path.isfile(binary_path):
         return binary_path
 
+    want = TERRAFORM_DOCS_SHA256.get((system, arch))
+    if version != TERRAFORM_DOCS_VERSION or want is None:
+        raise RuntimeError(
+            f"no pinned checksum for terraform-docs {version} {system}/{arch};"
+            " install terraform-docs on PATH yourself"
+        )
+
     os.makedirs(install_dir, exist_ok=True)
     filename = f"terraform-docs-{version}-{system}-{arch}.tar.gz"
     url = (
@@ -47,6 +63,13 @@ def _terraform_docs_binary(version=TERRAFORM_DOCS_VERSION):
     with tempfile.TemporaryDirectory() as tmpdir:
         archive = os.path.join(tmpdir, filename)
         urllib.request.urlretrieve(url, archive)
+        with open(archive, "rb") as fh:
+            got = hashlib.sha256(fh.read()).hexdigest()
+        if got != want:
+            raise RuntimeError(
+                f"terraform-docs checksum mismatch for {filename}: "
+                f"expected {want}, got {got}"
+            )
         with tarfile.open(archive) as tar:
             member = tar.getmember("terraform-docs")
             member.name = "terraform-docs"
