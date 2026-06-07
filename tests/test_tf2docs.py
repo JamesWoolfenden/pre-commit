@@ -30,7 +30,9 @@ def test_binary_cached_in_install_dir():
 
         with mock.patch("shutil.which", return_value=None), mock.patch(
             "os.path.expanduser", return_value=tmpdir
-        ), mock.patch("urllib.request.urlretrieve") as mock_dl:
+        ), mock.patch("platform.system", return_value="Linux"), mock.patch(
+            "urllib.request.urlretrieve"
+        ) as mock_dl:
             result = tf2docs.invoke._terraform_docs_binary()
 
         mock_dl.assert_not_called()
@@ -292,6 +294,52 @@ def test_run_success_with_update():
 
         assert "## Inputs" in updated_content
         assert "Old docs here" not in updated_content
+
+
+def test_run_decodes_terraform_docs_output_as_utf8():
+    """terraform-docs always emits UTF-8; decoding it with the platform's
+    preferred locale encoding (e.g. cp1252 on Windows) mangles non-ASCII
+    characters such as em dashes into mojibake. Pin the subprocess decode to
+    utf-8 regardless of locale."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        test_file = os.path.join(tmpdir, "main.tf")
+        with open(test_file, "w") as f:
+            f.write(
+                'variable "example" {\n'
+                '  description = "An example variable"\n'
+                "  type = string\n"
+                "}\n"
+            )
+
+        readme_path = os.path.join(tmpdir, "README.md")
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write(
+                "# My Module\n"
+                "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\n"
+                "Old docs here\n"
+                "<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\n"
+            )
+
+        mock_result = mock.Mock()
+        mock_result.returncode = 0
+        mock_result.stdout = "Required — an em dash from terraform-docs\n"
+
+        with mock.patch(
+            "tf2docs.invoke._terraform_docs_binary",
+            return_value="/usr/bin/terraform-docs",
+        ), mock.patch("subprocess.run") as mock_run:
+            mock_run.return_value = mock_result
+            tf2docs.invoke.run([test_file])
+
+        # The subprocess decode must be pinned to utf-8, not left to the
+        # platform locale (encoding=None), or non-ASCII bytes get mangled.
+        _, kwargs = mock_run.call_args
+        assert kwargs["encoding"] == "utf-8"
+
+        with open(readme_path, "r", encoding="utf-8") as f:
+            updated_content = f.read()
+
+        assert "Required — an em dash from terraform-docs" in updated_content
 
 
 def test_run_no_update_needed():

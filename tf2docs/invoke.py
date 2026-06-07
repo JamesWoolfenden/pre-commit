@@ -178,7 +178,7 @@ def run(filenames, version=TERRAFORM_DOCS_VERSION):
             shell=False,
             text=True,
             capture_output=True,
-            encoding=None,
+            encoding="utf-8",
             check=False,
         )
 
